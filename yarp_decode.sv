@@ -1,3 +1,6 @@
+// --------------------------------------------------------
+// Instruction Decode
+// --------------------------------------------------------
 
 module yarp_decode import yarp_pkg::*; (
   input   logic [31:0]  instr_i,
@@ -49,13 +52,6 @@ module yarp_decode import yarp_pkg::*; (
   assign b_type_imm = {{19{instr_i[31]}}, instr_i[31], instr_i[7], instr_i[30:25], instr_i[11:8], 1'b0};
   assign u_type_imm = {instr_i[31:12], 12'b0};
   assign j_type_imm = {{11{instr_i[31]}}, instr_i[31], instr_i[19:12], instr_i[20], instr_i[30:21], 1'b0};
-  
-  assign instr_imm = r_type ? 32'h0:
-									   i_type ? i_type_imm:
-										 s_type ? s_type_imm:
-										 b_type ? b_type_imm:
-										 u_type ? u_type_imm:
-										 					j_type_imm;
     
   always_comb begin
     r_type = 1'b0;
@@ -78,6 +74,13 @@ module yarp_decode import yarp_pkg::*; (
     endcase
   end
   
+  assign instr_imm = r_type ? 32'h0:
+									   i_type ? i_type_imm:
+										 s_type ? s_type_imm:
+										 b_type ? b_type_imm:
+										 u_type ? u_type_imm:
+										 					j_type_imm;
+                            
   assign rs1_o            = rs1;
   assign rs2_o            = rs2;
   assign rd_o             = rd;
