@@ -1,7 +1,5 @@
-// --------------------------------------------------------
-// Instruction Memory - RTL
-// --------------------------------------------------------
 
+// Instruction Memory - RTL
 module yarp_instr_mem (
   input    logic          clk,
   input    logic          reset_n,
@@ -19,9 +17,8 @@ module yarp_instr_mem (
   output   logic [31:0]   instr_mem_instr_o
 );
 
-  // --------------------------------------------------------
+
   // Internal signals
-  // --------------------------------------------------------
   logic instr_mem_req_q;
 
   // Assert valid always since the processor will need a new

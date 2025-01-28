@@ -1,7 +1,4 @@
-// --------------------------------------------------------
 // Instruction Decode
-// --------------------------------------------------------
-
 module yarp_decode import yarp_pkg::*; (
   input   logic [31:0]  instr_i,
   output  logic [4:0]   rs1_o,

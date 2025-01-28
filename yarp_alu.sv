@@ -1,7 +1,4 @@
-// --------------------------------------------------------
 // Arithmetic Logical Unit (ALU)
-// --------------------------------------------------------
-
 module yarp_execute import yarp_pkg::*; (
   // Source operands
   input   logic [31:0] opr_a_i,
