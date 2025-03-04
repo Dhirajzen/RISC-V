@@ -7,8 +7,8 @@ class yarp_mem_seq extends yarp_base_seq;
   bit test_all_mem_access_types = 1;  // Test all memory access types (byte, half-word, word)
   bit test_mem_alignment = 1;         // Test memory alignment cases
   
-  // Address ranges
-  logic [31:0] data_mem_start = 32'h2000;
+  // Address ranges - Modified to use smaller offsets that fit in 12 bits
+  logic [31:0] data_mem_start = 32'h200;    // Reduced from 0x2000
   logic [31:0] main_program_addr = 32'h1000;
   
   // Constructor
@@ -48,8 +48,8 @@ class yarp_mem_seq extends yarp_base_seq;
     // Word access tests (lw, sw)
     // -------------------------------------------------------------------------
     
-    // Store word (x1 to mem[2000])
-    instr = gen_store_instr(2'b11, 5'd1, 5'd0, 12'h2000);  // sw x1, 0x2000(x0)
+    // Store word (x1 to mem[0x200])
+    instr = gen_store_instr(2'b11, 5'd1, 5'd0, 12'h200);  // sw x1, 0x200(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -57,12 +57,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Now create the data memory write transaction that we expect to happen
-    item = create_data_write(32'h2000, reg_file[1], 2'b11);
+    item = create_data_write(32'h200, reg_file[1], 2'b11);
     start_item(item);
     finish_item(item);
     
-    // Load word (mem[2000] to x2)
-    instr = gen_load_instr(2'b11, 5'd2, 5'd0, 12'h2000);  // lw x2, 0x2000(x0)
+    // Load word (mem[0x200] to x2)
+    instr = gen_load_instr(2'b11, 5'd2, 5'd0, 12'h200);  // lw x2, 0x200(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -70,7 +70,7 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction that we expect to happen
-    item = create_data_read(32'h2000, reg_file[1], 2'b11);
+    item = create_data_read(32'h200, reg_file[1], 2'b11);
     start_item(item);
     finish_item(item);
     
@@ -78,8 +78,8 @@ class yarp_mem_seq extends yarp_base_seq;
     // Half-word access tests (lh, lhu, sh)
     // -------------------------------------------------------------------------
     
-    // Store half-word (x1 to mem[2004])
-    instr = gen_store_instr(2'b01, 5'd1, 5'd0, 12'h2004);  // sh x1, 0x2004(x0)
+    // Store half-word (x1 to mem[0x204])
+    instr = gen_store_instr(2'b01, 5'd1, 5'd0, 12'h204);  // sh x1, 0x204(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -87,12 +87,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory write transaction that we expect to happen
-    item = create_data_write(32'h2004, reg_file[1] & 16'hFFFF, 2'b01);
+    item = create_data_write(32'h204, reg_file[1] & 16'hFFFF, 2'b01);
     start_item(item);
     finish_item(item);
     
-    // Load half-word with sign extension (mem[2004] to x3)
-    instr = gen_load_instr(2'b01, 5'd3, 5'd0, 12'h2004);  // lh x3, 0x2004(x0)
+    // Load half-word with sign extension (mem[0x204] to x3)
+    instr = gen_load_instr(2'b01, 5'd3, 5'd0, 12'h204);  // lh x3, 0x204(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -100,12 +100,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction that we expect to happen
-    item = create_data_read(32'h2004, {{16{reg_file[1][15]}}, reg_file[1][15:0]}, 2'b01);
+    item = create_data_read(32'h204, {{16{reg_file[1][15]}}, reg_file[1][15:0]}, 2'b01);
     start_item(item);
     finish_item(item);
     
-    // Load half-word with zero extension (mem[2004] to x4)
-    instr = gen_load_instr_zero_ext(2'b01, 5'd4, 5'd0, 12'h2004);  // lhu x4, 0x2004(x0)
+    // Load half-word with zero extension (mem[0x204] to x4)
+    instr = gen_load_instr_zero_ext(2'b01, 5'd4, 5'd0, 12'h204);  // lhu x4, 0x204(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -113,7 +113,7 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction that we expect to happen
-    item = create_data_read(32'h2004, {{16{1'b0}}, reg_file[1][15:0]}, 2'b01);
+    item = create_data_read(32'h204, {{16{1'b0}}, reg_file[1][15:0]}, 2'b01);
     start_item(item);
     finish_item(item);
     
@@ -121,8 +121,8 @@ class yarp_mem_seq extends yarp_base_seq;
     // Byte access tests (lb, lbu, sb)
     // -------------------------------------------------------------------------
     
-    // Store byte (x1 to mem[2008])
-    instr = gen_store_instr(2'b00, 5'd1, 5'd0, 12'h2008);  // sb x1, 0x2008(x0)
+    // Store byte (x1 to mem[0x208])
+    instr = gen_store_instr(2'b00, 5'd1, 5'd0, 12'h208);  // sb x1, 0x208(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -130,12 +130,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory write transaction that we expect to happen
-    item = create_data_write(32'h2008, reg_file[1] & 8'hFF, 2'b00);
+    item = create_data_write(32'h208, reg_file[1] & 8'hFF, 2'b00);
     start_item(item);
     finish_item(item);
     
-    // Load byte with sign extension (mem[2008] to x5)
-    instr = gen_load_instr(2'b00, 5'd5, 5'd0, 12'h2008);  // lb x5, 0x2008(x0)
+    // Load byte with sign extension (mem[0x208] to x5)
+    instr = gen_load_instr(2'b00, 5'd5, 5'd0, 12'h208);  // lb x5, 0x208(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -143,12 +143,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction that we expect to happen
-    item = create_data_read(32'h2008, {{24{reg_file[1][7]}}, reg_file[1][7:0]}, 2'b00);
+    item = create_data_read(32'h208, {{24{reg_file[1][7]}}, reg_file[1][7:0]}, 2'b00);
     start_item(item);
     finish_item(item);
     
-    // Load byte with zero extension (mem[2008] to x6)
-    instr = gen_load_instr_zero_ext(2'b00, 5'd6, 5'd0, 12'h2008);  // lbu x6, 0x2008(x0)
+    // Load byte with zero extension (mem[0x208] to x6)
+    instr = gen_load_instr_zero_ext(2'b00, 5'd6, 5'd0, 12'h208);  // lbu x6, 0x208(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -156,7 +156,7 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction that we expect to happen
-    item = create_data_read(32'h2008, {{24{1'b0}}, reg_file[1][7:0]}, 2'b00);
+    item = create_data_read(32'h208, {{24{1'b0}}, reg_file[1][7:0]}, 2'b00);
     start_item(item);
     finish_item(item);
   endtask
@@ -177,8 +177,8 @@ class yarp_mem_seq extends yarp_base_seq;
     // Aligned word access (address % 4 = 0)
     // -------------------------------------------------------------------------
     
-    // Store word at aligned address (x1 to mem[2100])
-    instr = gen_store_instr(2'b11, 5'd1, 5'd0, 12'h2100);  // sw x1, 0x2100(x0)
+    // Store word at aligned address (x1 to mem[0x300])
+    instr = gen_store_instr(2'b11, 5'd1, 5'd0, 12'h300);  // sw x1, 0x300(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -186,12 +186,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory write transaction
-    item = create_data_write(32'h2100, reg_file[1], 2'b11);
+    item = create_data_write(32'h300, reg_file[1], 2'b11);
     start_item(item);
     finish_item(item);
     
-    // Load word from aligned address (mem[2100] to x2)
-    instr = gen_load_instr(2'b11, 5'd2, 5'd0, 12'h2100);  // lw x2, 0x2100(x0)
+    // Load word from aligned address (mem[0x300] to x2)
+    instr = gen_load_instr(2'b11, 5'd2, 5'd0, 12'h300);  // lw x2, 0x300(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -199,7 +199,7 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction
-    item = create_data_read(32'h2100, reg_file[1], 2'b11);
+    item = create_data_read(32'h300, reg_file[1], 2'b11);
     start_item(item);
     finish_item(item);
     
@@ -207,8 +207,8 @@ class yarp_mem_seq extends yarp_base_seq;
     // Unaligned half-word access (address % 2 = 1)
     // -------------------------------------------------------------------------
     
-    // Store half-word at unaligned address (x1 to mem[2101])
-    instr = gen_store_instr(2'b01, 5'd1, 5'd0, 12'h2101);  // sh x1, 0x2101(x0)
+    // Store half-word at unaligned address (x1 to mem[0x301])
+    instr = gen_store_instr(2'b01, 5'd1, 5'd0, 12'h301);  // sh x1, 0x301(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -216,12 +216,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // This should be aligned to 2-byte boundary by hardware, so we expect:
-    item = create_data_write(32'h2100, (reg_file[1] & 16'hFFFF) << 8, 2'b01);
+    item = create_data_write(32'h300, (reg_file[1] & 16'hFFFF) << 8, 2'b01);
     start_item(item);
     finish_item(item);
     
-    // Load half-word from unaligned address (mem[2101] to x3)
-    instr = gen_load_instr(2'b01, 5'd3, 5'd0, 12'h2101);  // lh x3, 0x2101(x0)
+    // Load half-word from unaligned address (mem[0x301] to x3)
+    instr = gen_load_instr(2'b01, 5'd3, 5'd0, 12'h301);  // lh x3, 0x301(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -229,7 +229,7 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction
-    item = create_data_read(32'h2100, {{16{reg_file[1][15]}}, reg_file[1][15:0]}, 2'b01);
+    item = create_data_read(32'h300, {{16{reg_file[1][15]}}, reg_file[1][15:0]}, 2'b01);
     start_item(item);
     finish_item(item);
     
@@ -237,8 +237,8 @@ class yarp_mem_seq extends yarp_base_seq;
     // Half-word access at different alignments
     // -------------------------------------------------------------------------
     
-    // Store half-word at address 0x2102 (aligned)
-    instr = gen_store_instr(2'b01, 5'd1, 5'd0, 12'h2102);  // sh x1, 0x2102(x0)
+    // Store half-word at address 0x302 (aligned)
+    instr = gen_store_instr(2'b01, 5'd1, 5'd0, 12'h302);  // sh x1, 0x302(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -246,12 +246,12 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory write transaction
-    item = create_data_write(32'h2102, reg_file[1] & 16'hFFFF, 2'b01);
+    item = create_data_write(32'h302, reg_file[1] & 16'hFFFF, 2'b01);
     start_item(item);
     finish_item(item);
     
-    // Load half-word from address 0x2102 (aligned)
-    instr = gen_load_instr(2'b01, 5'd4, 5'd0, 12'h2102);  // lh x4, 0x2102(x0)
+    // Load half-word from address 0x302 (aligned)
+    instr = gen_load_instr(2'b01, 5'd4, 5'd0, 12'h302);  // lh x4, 0x302(x0)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -259,7 +259,7 @@ class yarp_mem_seq extends yarp_base_seq;
     pc += 4;
     
     // Create the data memory read transaction
-    item = create_data_read(32'h2102, {{16{reg_file[1][15]}}, reg_file[1][15:0]}, 2'b01);
+    item = create_data_read(32'h302, {{16{reg_file[1][15]}}, reg_file[1][15:0]}, 2'b01);
     start_item(item);
     finish_item(item);
     
@@ -267,9 +267,9 @@ class yarp_mem_seq extends yarp_base_seq;
     // Byte access at different alignments
     // -------------------------------------------------------------------------
     
-    // Store bytes at addresses 0x2104, 0x2105, 0x2106, 0x2107
+    // Store bytes at addresses 0x304, 0x305, 0x306, 0x307
     for (int i = 0; i < 4; i++) begin
-      instr = gen_store_instr(2'b00, 5'd1, 5'd0, 12'h2104 + i);  // sb x1, (0x2104+i)(x0)
+      instr = gen_store_instr(2'b00, 5'd1, 5'd0, 12'h304 + i);  // sb x1, (0x304+i)(x0)
       instr_mem[pc] = instr;
       item = create_instr_fetch(pc, instr);
       start_item(item);
@@ -277,14 +277,14 @@ class yarp_mem_seq extends yarp_base_seq;
       pc += 4;
       
       // Create the data memory write transaction
-      item = create_data_write(32'h2104 + i, reg_file[1] & 8'hFF, 2'b00);
+      item = create_data_write(32'h304 + i, reg_file[1] & 8'hFF, 2'b00);
       start_item(item);
       finish_item(item);
     end
     
-    // Load bytes from addresses 0x2104, 0x2105, 0x2106, 0x2107
+    // Load bytes from addresses 0x304, 0x305, 0x306, 0x307
     for (int i = 0; i < 4; i++) begin
-      instr = gen_load_instr(2'b00, 5'd5+i, 5'd0, 12'h2104 + i);  // lb x(5+i), (0x2104+i)(x0)
+      instr = gen_load_instr(2'b00, 5'd5+i, 5'd0, 12'h304 + i);  // lb x(5+i), (0x304+i)(x0)
       instr_mem[pc] = instr;
       item = create_instr_fetch(pc, instr);
       start_item(item);
@@ -292,7 +292,7 @@ class yarp_mem_seq extends yarp_base_seq;
       pc += 4;
       
       // Create the data memory read transaction
-      item = create_data_read(32'h2104 + i, {{24{reg_file[1][7]}}, reg_file[1][7:0]}, 2'b00);
+      item = create_data_read(32'h304 + i, {{24{reg_file[1][7]}}, reg_file[1][7:0]}, 2'b00);
       start_item(item);
       finish_item(item);
     end
@@ -303,6 +303,7 @@ class yarp_mem_seq extends yarp_base_seq;
     yarp_seq_item item;
     logic [31:0] instr;
     logic [31:0] pc = main_program_addr + 32'h200;  // Offset from main program
+    logic [31:0] loop_start;  // Declare at beginning of task - fixed syntax error
     
     `uvm_info(get_type_name(), "Testing memory access patterns", UVM_MEDIUM)
     
@@ -324,8 +325,8 @@ class yarp_mem_seq extends yarp_base_seq;
       finish_item(item);
       pc += 4;
       
-      // Store word (x1 to mem[2200 + i*4])
-      instr = gen_store_instr(2'b11, 5'd1, 5'd0, 12'h2200 + (i*4));  // sw x1, (0x2200+i*4)(x0)
+      // Store word (x1 to mem[0x400 + i*4])
+      instr = gen_store_instr(2'b11, 5'd1, 5'd0, 12'h400 + (i*4));  // sw x1, (0x400+i*4)(x0)
       instr_mem[pc] = instr;
       item = create_instr_fetch(pc, instr);
       start_item(item);
@@ -333,7 +334,7 @@ class yarp_mem_seq extends yarp_base_seq;
       pc += 4;
       
       // Create the data memory write transaction
-      item = create_data_write(32'h2200 + (i*4), i, 2'b11);
+      item = create_data_write(32'h400 + (i*4), i, 2'b11);
       start_item(item);
       finish_item(item);
     end
@@ -354,11 +355,11 @@ class yarp_mem_seq extends yarp_base_seq;
     finish_item(item);
     pc += 4;
     
-    // Loop start
-    logic [31:0] loop_start = pc;
+    // Now assign loop_start - fixed syntax error
+    loop_start = pc;
     
-    // Load array element (mem[2200 + x2*4] to x1)
-    instr = gen_load_indexed(2'b11, 5'd1, 5'd2, 12'h2200);  // lw x1, 0x2200(x2)
+    // Load array element (mem[0x400 + x2*4] to x1)
+    instr = gen_load_indexed(2'b11, 5'd1, 5'd2, 12'h400);  // lw x1, 0x400(x2)
     instr_mem[pc] = instr;
     item = create_instr_fetch(pc, instr);
     start_item(item);
@@ -477,7 +478,7 @@ class yarp_mem_seq extends yarp_base_seq;
     return instr;
   endfunction
   
-  // Helper to generate a zero-extended load instruction with specific funct3
+  // Helper to generate a zero-extended load instruction
   virtual function logic [31:0] gen_load_instr_zero_ext(logic [1:0] size, 
                                                       logic [4:0] rd, 
                                                       logic [4:0] rs1, 
@@ -542,7 +543,7 @@ class yarp_mem_seq extends yarp_base_seq;
   virtual function logic [31:0] gen_branch_instruction(logic [2:0] funct3, 
                                                      logic [4:0] rs1, 
                                                      logic [4:0] rs2, 
-                                                     logic [11:0] imm12);
+                                                     logic [12:0] imm12);
     logic [31:0] instr;
     
     // Break down the immediate value into its parts for B-type encoding
